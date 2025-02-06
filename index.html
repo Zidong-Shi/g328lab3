@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Earthquake List</title>
+    <title>Stream Station List</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.0/mapbox-gl.js"></script>
@@ -15,7 +15,7 @@
         #container {
             display: flex;
             height: 100vh;
-            flex-direction: row;
+            flex-direction: row-reverse;
             align-items: stretch;
         }
         #side-panel {
@@ -50,7 +50,7 @@
     <main id="container">
         <div id="side-panel">
 
-            <h2>Earthquake List</h2>
+            <h2>Stream Station List</h2>
             <button>Sort by Magnitude</button>
 
             <table>
@@ -69,43 +69,43 @@
 
         let map = new mapboxgl.Map({
             container: 'map', // container ID
-            style: 'mapbox://styles/mapbox/satellite-v9', // style URL
-            zoom: 5.5, // starting zoom
-            center: [138, 38] // starting center
+            style: 'mapbox://styles/mapbox/streets-v11', // style URL
+            zoom: 6.5, // starting zoom
+            center: [-120.74, 47.75] // starting center
         });
 
         async function geojsonFetch() { 
-            let response, earthquakes, japan, table;
-            response = await fetch('assets/earthquakes.geojson');
-            earthquakes = await response.json();
-            response = await fetch('assets/japan.json');
-            japan = await response.json();
+            let response, stream, WAdistrict, table;
+            response = await fetch('assets/stream.geojson');
+            stream = await response.json();
+            response = await fetch('assets/WAdistrict.json');
+            WAdistrict = await response.json();
 
             //create table
             table = document.getElementsByTagName("table")[0];
             let row, cell1, cell2, cell3;
-            for (let i = 0; i < earthquakes.features.length; i++) {
+            for (let i = 0; i < stream.features.length; i++) {
                 // Create an empty <tr> element and add it to the 1st position of the table:
                 row = table.insertRow(-1);
                 cell1 = row.insertCell(0);
                 cell2 = row.insertCell(1);
                 cell3 = row.insertCell(2);
-                cell1.innerHTML = earthquakes.features[i].properties.id;
-                cell2.innerHTML = earthquakes.features[i].properties.mag;
-                cell3.innerHTML = new Date(earthquakes.features[i].properties.time).toLocaleDateString(
+                cell1.innerHTML = stream.features[i].properties.id;
+                cell2.innerHTML = stream.features[i].properties.mag;
+                cell3.innerHTML = new Date(stream.features[i].properties.time).toLocaleDateString(
                     "en-US");
             }
 
             //load data to the map as new layers and table on the side.
             map.on('load', function loadingData() {
-                map.addSource('earthquakes', {
+                map.addSource('stream', {
                     type: 'geojson',
-                    data: earthquakes
+                    data: stream
                 });
                 map.addLayer({
-                    'id': 'earthquakes-layer',
+                    'id': 'stream-layer',
                     'type': 'circle',
-                    'source': 'earthquakes',
+                    'source': 'stream',
                     'paint': {
                         'circle-radius': 8,
                         'circle-stroke-width': 2,
@@ -113,14 +113,14 @@
                         'circle-stroke-color': 'white'
                     }
                 });
-                map.addSource('japan', {
+                map.addSource('WAdistrict', {
                     type: 'geojson',
-                    data: japan
+                    data: WAdistrict
                 });
                 map.addLayer({
-                    'id': 'japan-layer',
+                    'id': 'WAdistrict-layer',
                     'type': 'fill',
-                    'source': 'japan',
+                    'source': 'WAdistrict',
                     'paint': {
                         'fill-color': '#0080ff', // blue color fill
                         'fill-opacity': 0.5
